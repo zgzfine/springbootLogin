@@ -1,0 +1,274 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<title>配置管理 | HOHO系统管理中心</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<!-- 新 Bootstrap 核心 CSS 文件 -->
+		<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css" />
+
+		<!-- 可选的Bootstrap主题文件（一般不用引入） -->
+		<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap-theme.min.css" />
+
+		<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+		<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+
+		<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+		<script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+	</head>
+
+	<body>
+		<!-- Fixed navbar -->
+		<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+           				<span class="sr-only">Toggle navigation</span>
+            			<span class="icon-bar"></span>
+          				</button>
+					<a class="navbar-brand" href="#">HOHO-SYSTEM</a>
+				</div>
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li >
+							<a th:href="@{/}">首页</a>
+						</li>
+						<li class="active">
+							<a th:href="@{/manage/system}">系统管理</a>
+						</li>
+						<li>
+							<a th:href="@{/manage/project}">项目管理</a>
+						</li>
+						<li>
+							<a th:href="@{/manage/config}">配置管理</a>
+						</li>
+						<li>
+							<a href="#contact">联系方式</a>
+						</li>
+					</ul>
+				</div>
+				<!--/.nav-collapse -->
+			</div>
+		</nav>
+
+		<div class="container theme-showcase" role="main">
+			<div class="page-header" style="margin-top: 80px;">
+				<h3>
+					<span class="glyphicon glyphicon-th"></span>  配置管理 <span th:text="${sysId}" style="display: none" id="systemId"></span>
+					<a th:href="@{/manage/system}" class="btn  btn-primary" style="float: right;">返回列表</a>
+				</h3>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title" style="display: inline-block;"><span class="glyphicon glyphicon-home"></span>  共有配置</h3>
+							<a class="btn btn-default btn-sm" th:href="@{/manage/system/{id}/public(id=${sysId})}" style="float: right;margin-top: -5px;">添加</a>
+						</div>
+						<div class="panel-body">
+							<table class="table table-bordered">
+								<thead>
+									<tr>
+										<th># ID</th>
+										<th>Key</th>
+										<th>Value</th>
+										<th>环境</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="item:${sc}" th:if="${item.type.nameEn} eq 'PUBLIC'">
+										<td th:text="${item.id}" class="col-sm-1"></td>
+										<td th:text="${item.itemKey}" class="col-sm-4"></td>
+										<td th:text="${item.itemValue}" class="col-sm-4"></td>
+										<td th:text="${item.environment.name}" class="col-sm-1"></td>
+										<td class="col-sm-1">
+											<button class="btn btn-danger btn-sm btnRemove" data-toggle="modal" data-target="#removeModal">移除</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title" style="display: inline-block;"><span class="glyphicon glyphicon-lock"></span>  私有配置</h3>
+							<button class="btn btn-default btn-sm btnAdd" data-toggle="modal" data-target="#addModal" style="float: right;margin-top: -5px;">添加</button>
+						</div>
+						<div class="panel-body">
+							<table class="table table-bordered">
+								<thead>
+									<tr>
+										<th># ID</th>
+										<th>Key</th>
+										<th>Value</th>
+										<th>环境</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="item:${sc}" th:if="${item.type.nameEn} eq 'PRIVATE'">
+										<td th:text="${item.id}" class="col-sm-1"></td>
+										<td th:text="${item.itemKey}" class="col-sm-4"></td>
+										<td th:text="${item.itemValue}" class="col-sm-4"></td>
+										<td th:text="${item.environment.name}" class="col-sm-1"></td>
+										<td class="col-sm-1">
+											<button class="btn btn-danger btn-sm btnRemove" data-toggle="modal" data-target="#removeModal">移除</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<!-- 移除操作-模态框（Modal） -->
+		<div class="modal fade" id="removeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">移除配置 </h4>
+					</div>
+					<div class="modal-body">
+						<h2>
+							<span class="label label-default">KEY</span><span class="label label-info" id="keyModal" style="margin: 20px;"></span>
+							<div style="padding:10px"></div>
+							<span class="label label-default">VALUE</span><span class="label label-info" id="valueModal" style="margin: 20px;"></span>
+						</h2>
+						<div style="padding:10px"></div>
+						确定要移除此配置吗？
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+						</button>
+						<button type="button" class="btn btn-danger" id="remove">
+							移除
+						</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+
+		<!-- 添加操作-模态框（Modal） -->
+		<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">添加配置 </h4>
+					</div>
+					<div class="modal-body">
+						<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label for="configKey" class="col-sm-2 control-label">Key</label>
+								<div class="col-sm-10">
+									<input type="text" class="form-control" id="configKey" placeholder="配置项名称，如server.port"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="configValue" class="col-sm-2 control-label">Value</label>
+								<div class="col-sm-10">
+									<input type="text" class="form-control" id="configValue" placeholder="配置项值，如80"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="configValue" class="col-sm-2 control-label">其他</label>
+								<div class="col-sm-3">
+									<select class="form-control" id="configType" name="configType">
+										<option value="PRIVATE">私有</option>
+									</select>
+								</div>
+								<div class="col-sm-3">
+									<select class="form-control" id="configStatus" name="configStatus">
+										<option value="ON">启用</option>
+										<option value="OFF">禁用</option>
+									</select>
+								</div>
+								<div class="col-sm-4">
+									<select class="form-control" id="configEnvironment" name="configEnvironment">
+										<option value="DEV">开发环境</option>
+										<option value="STABLE">测试环境</option>
+										<option value="PROD">生产环境</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">描述</label>
+								<div class="col-sm-10">
+                            <textarea class="form-control" rows="3" placeholder="用一段简洁的话来描述此系统"
+									  id="configDescription"></textarea>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+						</button>
+						<button type="button" class="btn btn-danger" id="add">
+							确定
+						</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal -->
+		</div>
+
+	</body>
+
+	<script type="text/javascript">
+		var url = null;
+
+		$(document).ready(function () {
+			$(".btnRemove").click(function () {
+				url = "/manage/api/system/"+ $("#systemId").text() + "/config/" + $(this).parent().parent().find("td").first().text() + "/remove";
+				$("#keyModal").text($(this).parent().parent().find("td").eq(1).text());
+				$("#valueModal").text($(this).parent().parent().find("td").eq(2).text());
+				console.info($("#keyModal").text($(this).parent().parent().find("td").eq(1).text()));
+				console.info($("#valueModal").text($(this).parent().parent().find("td").eq(2).text()));
+				console.info(url);
+			});
+
+			$("#remove").click(function() {
+				$.get(url, function(data, status) {
+					if("移除成功" != data) {
+						alert(data);
+					}
+					window.location.reload();
+				});
+			});
+
+			$("#add").click(function () {
+				url = "/manage/api/system/"+ $("#systemId").text() + "/private";
+				$.post(url,
+						{
+							"key": $("#configKey").val(),
+							"value": $("#configValue").val(),
+							"type": $("#configType").find("option:selected").val(),
+							"environment": $("#configEnvironment").find("option:selected").val(),
+							"status": $("#configStatus").find("option:selected").val(),
+							"description": $("#configDescription").val()
+						},
+						function (data, status) {
+							if ("添加成功" != data) {
+								alert(data);
+							}
+							window.location.reload();
+						});
+			});
+		});
+	</script>
+
+</html>

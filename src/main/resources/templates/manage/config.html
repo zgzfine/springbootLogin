@@ -1,0 +1,424 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>配置列表 | HOHO系统管理中心</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css"/>
+
+    <!-- 可选的Bootstrap主题文件（一般不用引入） -->
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap-theme.min.css"/>
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<!-- Fixed navbar -->
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">HOHO-SYSTEM</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li >
+                    <a th:href="@{/}">首页</a>
+                </li>
+                <li >
+                    <a th:href="@{/manage/system}">系统管理</a>
+                </li>
+                <li >
+                    <a th:href="@{/manage/project}">项目管理</a>
+                </li>
+                <li class="active">
+                    <a th:href="@{/manage/config}">配置管理</a>
+                </li>
+                <li>
+                    <a href="#contact">联系方式</a>
+                </li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div style="padding: 20px;">
+    <div style="margin-top: 60px;border-bottom: 2px solid red;padding-bottom: 50px;">
+        <button class="btn btn-sm btn-success btnAdd" data-toggle="modal" data-target="#addModal" style="float: left;">
+            <span class="glyphicon glyphicon-plus"></span> 添加配置
+        </button>
+        <form class="form-inline" style="float: right;" th:action="@{/manage/config}" method="get">
+            <div class="form-group searchInput" style="display: none">
+                <div class="col-sm-6">
+                    <input class="form-control" type="text" placeholder="index" name="p" value="1"/>
+                </div>
+            </div>
+            <div class="form-group searchInput">
+                <div class="col-sm-6">
+                    <input class="form-control" type="text" placeholder="Key" name="key" id="key"/>
+                </div>
+            </div>
+            <div class="form-group searchInput">
+                <div class="col-sm-6">
+                    <input class="form-control" type="text" placeholder="Value" name="value" id="value"/>
+                </div>
+            </div>
+            <div class="form-group searchInput">
+                <div class="col-sm-6">
+                    <select class="form-control" id="type" name="type">
+                        <option value="">类型</option>
+                        <option value="PUBLIC">公有</option>
+                        <option value="PRIVATE">私有</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group searchInput">
+                <div class="col-sm-6">
+                    <select class="form-control" id="env" name="env">
+                        <option value="">环境</option>
+                        <option value="DEV">开发环境</option>
+                        <option value="STABLE">测试环境</option>
+                        <option value="PROD">生产环境</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group searchInput">
+                <div class="col-sm-6">
+                    <select class="form-control" id="status" name="status">
+                        <option value="">状态</option>
+                        <option value="ON">启用</option>
+                        <option value="OFF">禁用</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <input type="submit" class="btn btn-default" id="btnSearch" value="查找"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th class="col-sm-1">#ID</th>
+                    <th class="col-sm-2">Key</th>
+                    <th class="col-sm-2">Value</th>
+                    <th class="col-sm-1">类型</th>
+                    <th class="col-sm-1">环境</th>
+                    <th class="col-sm-1">状态</th>
+                    <th class="col-sm-1">描述</th>
+                    <th class="col-sm-1">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${pager.data}">
+                    <td th:text="${item.id}"></td>
+                    <td th:text="${item.itemKey}"></td>
+                    <td th:text="${item.itemValue}"></td>
+                    <td th:text="${item.type.name}"></td>
+                    <td th:text="${item.environment.name}"></td>
+                    <td th:text="${item.status.name}"></td>
+                    <td th:text="${item.description}"></td>
+                    <td>
+                        <button class="btn btn-sm btn-warning btnUpdate" data-toggle="modal" data-target="#updateModal">
+                            修改
+                        </button>
+                        <button class="btn btn-sm btn-danger btnDelete" data-toggle="modal" data-target="#deleteModal">
+                            删除
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <nav style="text-align: center">
+            <ul class="pagination pagination-lg">
+                <li>
+                    <a href="#">&laquo;</a>
+                </li>
+                <li th:each="page : ${pager.pageList}">
+                    <a th:href="@{/manage/config(p=${page}, key=${key}, value=${value}, type=${type}, env=${env}, status=${status})}" th:text="${page}"></a>
+                </li>
+                <li>
+                    <a href="#">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+</div>
+
+<!-- 删除操作-模态框（Modal） -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">删除配置 </h4>
+            </div>
+            <div class="modal-body">
+                <h2>
+                    <span class="label label-default">Kay</span><span class="label label-info" id="keyModal"
+                                                                      style="margin: 20px;"></span>
+                    <div style="padding:10px"></div>
+                    <span class="label label-default">Value</span><span class="label label-info" id="descModal"
+                                                                        style="margin: 20px;"></span>
+                </h2>
+                <div style="padding:10px"></div>
+                确定要删除此系统吗？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+                <button type="button" class="btn btn-danger" id="delete">
+                    删除
+                </button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal -->
+</div>
+
+
+<!-- 添加操作-模态框（Modal） -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">添加配置 </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="configKey" class="col-sm-2 control-label">Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="configKey" placeholder="配置项名称，如server.port"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="configValue" class="col-sm-2 control-label">Value</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="configValue" placeholder="配置项值，如80"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="configValue" class="col-sm-2 control-label">其他</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" id="configType" name="configType">
+                                <option value="PUBLIC">公有</option>
+                                <option value="PRIVATE">私有</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <select class="form-control" id="configStatus" name="configStatus">
+                                <option value="ON">启用</option>
+                                <option value="OFF">禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <select class="form-control" id="configEnvironment" name="configEnvironment">
+                                <option value="DEV">开发环境</option>
+                                <option value="STABLE">测试环境</option>
+                                <option value="PROD">生产环境</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">描述</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" placeholder="用一段简洁的话来描述此系统"
+                                      id="configDescription"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+                <button type="button" class="btn btn-danger" id="add">
+                    确定
+                </button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal -->
+</div>
+
+
+<!-- 修改-模态框（Modal） -->
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">修改配置 </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group" style="display: none">
+                        <label for="configKey" class="col-sm-2 control-label">Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="updateId" placeholder="id"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="configKey" class="col-sm-2 control-label">Key</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="updateKey" placeholder="配置项名称，如server.port"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="configValue" class="col-sm-2 control-label">Value</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="updateValue" placeholder="配置项值，如80"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="configValue" class="col-sm-2 control-label">其他</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" id="updateType" name="configType">
+                                <option value="PUBLIC">公有</option>
+                                <option value="PRIVATE">私有</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <select class="form-control" id="updateStatus" name="configStatus">
+                                <option value="ON">启用</option>
+                                <option value="OFF">禁用</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <select class="form-control" id="updateEnvironment" name="configEnvironment">
+                                <option value="DEV">开发环境</option>
+                                <option value="STABLE">测试环境</option>
+                                <option value="PROD">生产环境</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">描述</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" placeholder="用一段简洁的话来描述此系统"
+                                      id="updateDescription"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+                <button type="button" class="btn btn-danger" id="update">
+                    确定
+                </button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal -->
+</div>
+
+
+
+</body>
+
+<script type="text/javascript">
+    var url = null;
+    $(document).ready(function () {
+        $(".btnDelete").click(function () {
+            url = "/manage/api/config/" + $(this).parent().parent().find("td").first().text() + "/delete";
+            $("#keyModal").text($(this).parent().parent().find("td").eq(1).text());
+            $("#descModal").text($(this).parent().parent().find("td").eq(2).text());
+        });
+
+        $(".btnUpdate").click(function () {
+            url = "/manage/api/config/" + $(this).parent().parent().find("td").first().text() + "/update";
+            var type = $(this).parent().parent().find("td").eq(3).text() == "公有" ? "PUBLIC" : "PRIVATE";
+            var status = $(this).parent().parent().find("td").eq(5).text() == "启用" ? "ON" : "OFF";
+            var environment = $(this).parent().parent().find("td").eq(4).text() == "开发环境" ? "DEV" : $(this).parent().parent().find("td").eq(4).text() == "测试环境" ? "STABLE" : "PROD";
+            $("#updateId").val($(this).parent().parent().find("td").eq(0).text());
+            $("#updateKey").val($(this).parent().parent().find("td").eq(1).text());
+            $("#updateValue").val($(this).parent().parent().find("td").eq(2).text());
+            $("#updateType").val(type);
+            $("#updateEnvironment").val(environment);
+            $("#updateStatus").val(status);
+            $("#updateDescription").val($(this).parent().parent().find("td").eq(6).text());
+        });
+
+
+        $("#delete").click(function () {
+            $.get(url, function (data, status) {
+                if ("删除成功" != data) {
+                    alert(data);
+                }
+                window.location.reload();
+            });
+        });
+
+        $("#add").click(function () {
+            url = "/manage/api/config/add";
+            $.post(url,
+                    {
+                        "key": $("#configKey").val(),
+                        "value": $("#configValue").val(),
+                        "type": $("#configType").find("option:selected").val(),
+                        "environment": $("#configEnvironment").find("option:selected").val(),
+                        "status": $("#configStatus").find("option:selected").val(),
+                        "description": $("#configDescription").val()
+                    },
+                    function (data, status) {
+                        if ("添加成功" != data) {
+                            alert(data);
+                        }
+                        window.location.reload();
+                    });
+        });
+
+
+        $("#update").click(function () {
+            $.post(url,
+                    {
+                        "id": $("#updateId").val(),
+                        "key": $("#updateKey").val(),
+                        "value": $("#updateValue").val(),
+                        "type": $("#updateType").find("option:selected").val(),
+                        "environment": $("#updateEnvironment").find("option:selected").val(),
+                        "status": $("#updateStatus").find("option:selected").val(),
+                        "description": $("#updateDescription").val()
+                    },
+                    function (data, status) {
+                        if ("修改成功" != data) {
+                            alert(data);
+                        }
+                        window.location.reload();
+                    });
+        });
+
+    });
+</script>
+
+</html>
